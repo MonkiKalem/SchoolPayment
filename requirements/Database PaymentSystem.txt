@@ -1,0 +1,66 @@
+CREATE DATABASE db_schoolPayment
+
+CREATE TABLE admin (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE pegawai (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(100) NOT NULL,
+    npwp VARCHAR(20) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    telepon VARCHAR(15)
+);
+
+CREATE TABLE harga_spp (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tahun_masuk YEAR UNIQUE NOT NULL,
+    harga DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE siswa (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nis VARCHAR(20) UNIQUE NOT NULL,
+    nama VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    tahun_masuk YEAR NOT NULL,
+    telepon_pribadi VARCHAR(15),
+    telepon_orang_tua VARCHAR(15),
+    total_tunggakan DECIMAL(10, 2) DEFAULT 0,
+    harga_spp_id INT NOT NULL,
+    FOREIGN KEY (harga_spp_id) REFERENCES harga_spp(id)
+);
+
+CREATE TABLE pembayaran (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    siswa_id INT NOT NULL,
+    pegawai_id INT DEFAULT NULL,
+    tanggal DATE NOT NULL,
+    metode ENUM('virtual', 'manual') NOT NULL,
+    jumlah DECIMAL(10, 2) NOT NULL,
+    status ENUM('sukses', 'gagal') NOT NULL,
+    FOREIGN KEY (siswa_id) REFERENCES siswa(id),
+    FOREIGN KEY (pegawai_id) REFERENCES pegawai(id)
+);
+
+CREATE TABLE notifikasi (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    siswa_id INT NOT NULL,
+    pesan TEXT NOT NULL,
+    tanggal_kirim DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('terkirim', 'gagal') DEFAULT 'terkirim',
+    FOREIGN KEY (siswa_id) REFERENCES siswa(id)
+);
+
+CREATE TABLE log_aktivitas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    user_role ENUM('admin', 'pegawai') NOT NULL,
+    aktivitas TEXT NOT NULL,
+    tanggal DATETIME DEFAULT CURRENT_TIMESTAMP
+);
